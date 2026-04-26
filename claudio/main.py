@@ -59,6 +59,7 @@ class MusicResponse(BaseModel):
 async def get_recommendations(request: RecommendationRequest):
     """Get music recommendations"""
     try:
+        # Get recommendations (this will also initialize database and import sample data if needed)
         if request.context:
             recommendations = recommendation_engine.get_recommendations(
                 request.user_id, request.context, request.limit
@@ -83,7 +84,12 @@ async def get_recommendations(request: RecommendationRequest):
             recommendations=recommendations
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error in /api/recommend: {e}")
+        # Return a friendly error message instead of a 500 error
+        return MusicResponse(
+            response="抱歉，我遇到了一些问题。请检查服务器日志以了解详细信息。",
+            recommendations=[]
+        )
 
 @app.post("/api/chat", response_model=MusicResponse)
 async def chat_with_claudio(request: UserInput):
@@ -126,7 +132,12 @@ async def chat_with_claudio(request: UserInput):
                 recommendations=[]
             )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error in /api/chat: {e}")
+        # Return a friendly error message instead of a 500 error
+        return MusicResponse(
+            response="抱歉，我遇到了一些问题。请检查服务器日志以了解详细信息。",
+            recommendations=[]
+        )
 
 @app.post("/api/generate-playlist-name")
 async def generate_playlist_name(request: PlaylistRequest):

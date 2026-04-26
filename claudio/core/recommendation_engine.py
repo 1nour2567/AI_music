@@ -17,6 +17,13 @@ class RecommendationEngine:
         self.Session = sessionmaker(bind=self.engine)
         self.scene_engine = SceneAwareEngine()
         
+        # Create database tables
+        from models.music import Base
+        Base.metadata.create_all(self.engine)
+        
+        # Import sample data if database is empty
+        self._import_sample_data()
+        
         # Initialize ChromaDB for vector similarity search
         self.chroma_client = chromadb.Client()
         self.song_collection = self.chroma_client.get_or_create_collection(name="songs")
@@ -166,6 +173,91 @@ class RecommendationEngine:
         
         # Get recommendations
         return self.get_recommendations(user_id, context, limit)
+    
+    def _import_sample_data(self):
+        """Import sample data if database is empty"""
+        session = self.Session()
+        try:
+            # Check if database is empty
+            from models.music import Song
+            song_count = session.query(Song).count()
+            
+            if song_count == 0:
+                print("Database is empty, importing sample data...")
+                
+                # Import sample songs
+                import json
+                import os
+                
+                # Get sample data path
+                sample_data_path = os.path.join(os.path.dirname(__file__), "..", "data")
+                
+                # Import songs
+                songs_path = os.path.join(sample_data_path, "songs", "sample_songs.json")
+                if os.path.exists(songs_path):
+                    with open(songs_path, 'r', encoding='utf-8') as f:
+                        songs_data = json.load(f)
+                        for song_data in songs_data:
+                            song = Song(
+                                id=song_data.get("id"),
+                                title=song_data.get("title"),
+                                artist=song_data.get("artist", []),
+                                album=song_data.get("album"),
+                                genre=song_data.get("genre", []),
+                                release_year=song_data.get("release_year"),
+                                duration=song_data.get("duration"),
+                                features=song_data.get("features", {})
+                            )
+                            session.add(song)
+                
+                # Import playlists
+                from models.music import Playlist, PlaylistSong
+                playlists_path = os.path.join(sample_data_path, "playlists", "sample_playlists.json")
+                if os.path.exists(playlists_path):
+                    with open(playlists_path, 'r', encoding='utf-8') as f:
+                        playlists_data = json.load(f)
+                        for playlist_data in playlists_data:
+                            playlist = Playlist(
+                                id=playlist_data.get("id"),
+                                name=playlist_data.get("name"),
+                                description=playlist_data.get("description"),
+                                context=playlist_data.get("context", {})
+                            )
+                            session.add(playlist)
+                            
+                            # Add playlist songs
+                            for position, song_id in enumerate(playlist_data.get("songs", [])):
+                                playlist_song = PlaylistSong(
+                                    playlist_id=playlist.id,
+                                    song_id=song_id,
+                                    position=position
+                                )
+                                session.add(playlist_song)
+                
+                # Import listening history
+                from models.music import UserMusicHistory
+                from datetime import datetime
+                history_path = os.path.join(sample_data_path, "history", "sample_history.json")
+                if os.path.exists(history_path):
+                    with open(history_path, 'r', encoding='utf-8') as f:
+                        history_data = json.load(f)
+                        for item in history_data:
+                            history = UserMusicHistory(
+                                user_id=item.get("user_id", "default"),
+                                song_id=item.get("song_id"),
+                                timestamp=datetime.fromisoformat(item.get("timestamp")) if item.get("timestamp") else datetime.now(),
+                                context=item.get("context", {}),
+                                skip_rate=item.get("skip_rate", 0.0)
+                            )
+                            session.add(history)
+                
+                session.commit()
+                print("Sample data imported successfully!")
+        except Exception as e:
+            session.rollback()
+            print(f"Error importing sample data: {e}")
+        finally:
+            session.close()
 
 
 # Example usage
