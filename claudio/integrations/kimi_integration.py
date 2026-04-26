@@ -27,7 +27,7 @@ class KimiIntegration:
         """Generate music recommendation response"""
         # Check if API key is set
         if not self.api_key or self.api_key == "placeholder_kimi_api_key":
-            return "您好！我是 Claudio，您的音乐智能助手。为了为您提供个性化的音乐推荐和聊天服务，我需要配置 Kimi API 密钥。请在 .env 文件中设置您的 Kimi API 密钥，然后重启服务。"
+            return self._generate_default_response(user_input, context, recommendations)
         
         prompt = f"""
 You are Claudio, a smart music agent that understands user preferences and provides personalized music recommendations.
@@ -50,6 +50,33 @@ Please respond with a friendly, natural response that:
         
         response = self._call_kimi_api(prompt)
         return response
+    
+    def _generate_default_response(self, user_input: str, context: Dict[str, Any], recommendations: List[Dict[str, Any]]) -> str:
+        """Generate a smart default response without calling the API"""
+        time_of_day = context.get('time', {}).get('time_of_day', 'day')
+        weather = context.get('weather', {}).get('condition', 'Sunny')
+        
+        greeting = ""
+        if time_of_day == 'morning':
+            greeting = "早上好！"
+        elif time_of_day == 'afternoon':
+            greeting = "下午好！"
+        elif time_of_day == 'evening':
+            greeting = "晚上好！"
+        else:
+            greeting = "晚上好！"
+        
+        recommendation_text = ""
+        if recommendations:
+            recommendation_text = f"我为您准备了{len(recommendations)}首歌曲：\n"
+            for i, song in enumerate(recommendations[:3], 1):
+                artists = ", ".join(song.get('artist', []))
+                recommendation_text += f"{i}. {song.get('title')} - {artists}\n"
+        
+        if not recommendation_text:
+            recommendation_text = "我已经准备了一些推荐歌曲，您可以点击推荐列表中的歌曲开始播放！"
+        
+        return f"{greeting}我是 Claudio，您的音乐智能助手！\n\n{recommendation_text}\n\n您可以点击上一首/下一首按钮切换歌曲，或者告诉我您想听什么类型的音乐！"
     
     def understand_user_intent(self, user_input: str) -> Dict[str, Any]:
         """Understand user intent from input"""

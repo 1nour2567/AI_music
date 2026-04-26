@@ -95,49 +95,92 @@ async def get_recommendations(request: RecommendationRequest):
 async def chat_with_claudio(request: UserInput):
     """Chat with Claudio about music"""
     try:
-        # Understand user intent
-        intent = kimi_integration.understand_user_intent(request.input)
-        
         # Get current context if not provided
         context = request.context or scene_engine.get_full_context(request.user_id)
         
-        # Handle different intents
-        if intent["intent"] in ["music_recommendation", "mood_change"]:
-            # Get recommendations based on intent
+        # Check if API key is configured
+        has_api_key = kimi_integration.api_key and kimi_integration.api_key != "placeholder_kimi_api_key"
+        
+        if has_api_key:
+            # Use full AI capabilities when API key is set
+            intent = kimi_integration.understand_user_intent(request.input)
+            
+            if intent["intent"] in ["music_recommendation", "mood_change"]:
+                recommendations = recommendation_engine.get_contextual_recommendations(
+                    request.user_id, 5
+                )
+                response = kimi_integration.generate_music_recommendation(
+                    request.input, context, recommendations
+                )
+                return MusicResponse(response=response, recommendations=recommendations)
+            else:
+                response = kimi_integration.generate_music_recommendation(
+                    request.input, context, []
+                )
+                return MusicResponse(response=response, recommendations=[])
+        else:
+            # Use smart default responses when no API key
+            user_message = request.input.lower()
             recommendations = recommendation_engine.get_contextual_recommendations(
                 request.user_id, 5
             )
             
-            # Generate response
-            response = kimi_integration.generate_music_recommendation(
-                request.input,
-                context,
-                recommendations
-            )
+            # Generate contextual responses
+            response = _generate_smart_chat_response(user_message, context, recommendations)
             
             return MusicResponse(
                 response=response,
                 recommendations=recommendations
             )
-        else:
-            # For other intents, just generate a response
-            response = kimi_integration.generate_music_recommendation(
-                request.input,
-                context,
-                []
-            )
-            
-            return MusicResponse(
-                response=response,
-                recommendations=[]
-            )
     except Exception as e:
         print(f"Error in /api/chat: {e}")
-        # Return a friendly error message instead of a 500 error
         return MusicResponse(
             response="抱歉，我遇到了一些问题。请检查服务器日志以了解详细信息。",
             recommendations=[]
         )
+
+
+def _generate_smart_chat_response(user_message: str, context: Dict, recommendations: List) -> str:
+    """Generate smart chat responses without API key"""
+    time_of_day = context.get('time', {}).get('time_of_day', 'day')
+    
+    # Common user intents
+    greetings = ['你好', '您好', '嗨', 'hi', 'hello', '早上好', '下午好', '晚上好']
+    music_requests = ['音乐', '歌', '听', '推荐', '播放', '唱']
+    mood_requests = ['开心', '难过', '快乐', '悲伤', '忧郁', '兴奋', '安静']
+    thanks = ['谢谢', '感谢', '谢了']
+    goodbye = ['再见', '拜拜', '走了', '离开']
+    
+    user_lower = user_message.lower()
+    
+    # Check for common intents
+    if any(greet in user_lower for greet in greetings):
+        time_greeting = {
+            'morning': '早上好',
+            'afternoon': '下午好', 
+            'evening': '晚上好',
+            'night': '晚上好'
+        }.get(time_of_day, '你好')
+        return f"{time_greeting}！我是 Claudio，您的音乐智能助手！我为您准备了一些推荐歌曲，您可以点击上一首/下一首按钮来切换。您想听什么类型的音乐呢？"
+    
+    elif any(request in user_lower for request in music_requests):
+        return f"好的！我为您准备了{len(recommendations)}首推荐歌曲！您可以点击推荐列表中的任意歌曲开始播放，或者用控制按钮切换。有什么特别想听的风格或歌手吗？"
+    
+    elif any(mood in user_lower for mood in mood_requests):
+        if any(word in user_lower for word in ['难过', '悲伤', '忧郁', '不开心']):
+            return "我理解您的心情。听一些温暖治愈的音乐会有帮助！我为您准备了一些舒缓的音乐，希望能让您感觉好一点。"
+        elif any(word in user_lower for word in ['开心', '快乐', '兴奋']):
+            return "太棒了！在这么好的心情下，听一些欢快的音乐会更棒！我为您准备了一些有活力的歌曲！"
+        return "我明白您的心情！让我们用合适的音乐来配合您的心情吧。"
+    
+    elif any(thank in user_lower for thank in thanks):
+        return "不客气！能为您服务是我的荣幸！如果有其他想听的音乐，随时告诉我！"
+    
+    elif any(bye in user_lower for bye in goodbye):
+        return "再见！希望您享受今天的音乐。下次想听音乐时，随时找我！"
+    
+    else:
+        return f"我收到您的消息了！我已经为您准备了{len(recommendations)}首推荐歌曲，您可以点击上一首/下一首按钮来切换，或者点击推荐列表中的任意歌曲开始播放！有什么特别想听的音乐吗？"
 
 @app.post("/api/generate-playlist-name")
 async def generate_playlist_name(request: PlaylistRequest):
