@@ -1,0 +1,50 @@
+[
+  {
+    "id": "song_001",
+    "title": "颜色",
+    "artist": ["许美静"],
+    "album": "都是夜归人",
+    "genre": ["华语流行", "抒情"],
+    "release_year": 1997,
+    "duration": 258,
+    "features": {
+      "tempo": 78.5,
+      "energy": 0.35,
+      "valence": 0.45,
+      "danceability": 0.25,
+      "acousticness": 0.8
+    }
+  },
+  {
+    "id": "song_002",
+    "title": "Canon in D",
+    "artist": ["Johann Pachelbel"],
+    "album": "Classical Masterpieces",
+    "genre": ["古典", "轻音乐"],
+    "release_year": 1680,
+    "duration": 360,
+    "features": {
+      "tempo": 60.0,
+      "energy": 0.2,
+      "valence": 0.6,
+      "danceability": 0.1,
+      "acousticness": 0.95
+    }
+  },
+  {
+    "id": "song_003",
+    "title": "Happy",
+    "artist": ["Pharrell Williams"],
+    "album": "G I R L",
+    "genre": ["流行", "R&B"],
+    "release_year": 2013,
+    "duration": 242,
+    "features": {
+      "tempo": 156.0,
+      "energy": 0.85,
+      "valence": 0.95,
+      "danceability": 0.8,
+      "acousticness": 0.1
+    }
+  }
+]
