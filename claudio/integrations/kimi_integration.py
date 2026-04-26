@@ -2,6 +2,7 @@ import requests
 import json
 import os
 from typing import Dict, Any, Optional, List
+from dotenv import load_dotenv
 
 
 class KimiIntegration:
@@ -9,6 +10,9 @@ class KimiIntegration:
     
     def __init__(self):
         """Initialize Kimi integration"""
+        # Load from .env file first
+        load_dotenv()
+        
         # Load from environment variables directly
         self.api_key = os.getenv('KIMI_API_KEY', 'placeholder_kimi_api_key')
         self.model = os.getenv('KIMI_MODEL', 'kimi')

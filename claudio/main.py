@@ -2,12 +2,16 @@ from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict, Any
+from dotenv import load_dotenv
 from core.scene_aware_engine import SceneAwareEngine
 from core.recommendation_engine import RecommendationEngine
 from core.device_control import DeviceControl
 from integrations.kimi_integration import KimiIntegration
 from data.data_importer import MusicDataImporter
 from config.config import settings
+
+# Load .env file
+load_dotenv()
 
 app = FastAPI(
     title="Claudio Music Agent API",
