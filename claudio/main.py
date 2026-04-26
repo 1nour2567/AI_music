@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 from core.scene_aware_engine import SceneAwareEngine
 from core.recommendation_engine import RecommendationEngine
 from core.device_control import DeviceControl
-from integrations.claude_integration import ClaudeIntegration
+from integrations.kimi_integration import KimiIntegration
 from data.data_importer import MusicDataImporter
 from config.config import settings
 
@@ -27,7 +27,7 @@ app.add_middleware(
 # Initialize engines
 scene_engine = SceneAwareEngine()
 recommendation_engine = RecommendationEngine()
-claude_integration = ClaudeIntegration()
+kimi_integration = KimiIntegration()
 device_control = DeviceControl()
 
 # Data models
@@ -68,7 +68,7 @@ async def get_recommendations(request: RecommendationRequest):
         context = request.context or scene_engine.get_full_context(request.user_id)
         
         # Generate natural language response
-        response = claude_integration.generate_music_recommendation(
+        response = kimi_integration.generate_music_recommendation(
             "Recommend me some music",
             context,
             recommendations
@@ -86,7 +86,7 @@ async def chat_with_claudio(request: UserInput):
     """Chat with Claudio about music"""
     try:
         # Understand user intent
-        intent = claude_integration.understand_user_intent(request.input)
+        intent = kimi_integration.understand_user_intent(request.input)
         
         # Get current context if not provided
         context = request.context or scene_engine.get_full_context(request.user_id)
@@ -99,7 +99,7 @@ async def chat_with_claudio(request: UserInput):
             )
             
             # Generate response
-            response = claude_integration.generate_music_recommendation(
+            response = kimi_integration.generate_music_recommendation(
                 request.input,
                 context,
                 recommendations
@@ -111,7 +111,7 @@ async def chat_with_claudio(request: UserInput):
             )
         else:
             # For other intents, just generate a response
-            response = claude_integration.generate_music_recommendation(
+            response = kimi_integration.generate_music_recommendation(
                 request.input,
                 context,
                 []
@@ -132,7 +132,7 @@ async def generate_playlist_name(request: PlaylistRequest):
         context = request.context or scene_engine.get_full_context(request.user_id)
         
         # Generate playlist name
-        playlist_name = claude_integration.generate_playlist_name(
+        playlist_name = kimi_integration.generate_playlist_name(
             request.songs,
             context
         )
