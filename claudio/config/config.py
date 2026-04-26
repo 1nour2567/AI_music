@@ -5,10 +5,10 @@ from typing import Optional
 class Settings(BaseSettings):
     """Application settings"""
     # API Keys
-    kimi_api_key: str
-    spotify_client_id: str
-    spotify_client_secret: str
-    openweather_api_key: str
+    kimi_api_key: str = "placeholder_kimi_api_key"
+    spotify_client_id: str = "placeholder_spotify_client_id"
+    spotify_client_secret: str = "placeholder_spotify_client_secret"
+    openweather_api_key: str = "placeholder_openweather_api_key"
     
     # Database
     database_url: str = "sqlite:///./claudio.db"

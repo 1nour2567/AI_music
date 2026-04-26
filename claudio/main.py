@@ -7,6 +7,7 @@ from core.recommendation_engine import RecommendationEngine
 from core.device_control import DeviceControl
 from integrations.kimi_integration import KimiIntegration
 from data.data_importer import MusicDataImporter
+from config.config import settings
 
 app = FastAPI(
     title="Claudio Music Agent API",
