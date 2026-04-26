@@ -11,6 +11,8 @@ function App() {
     currentTime: 78
   });
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentPlaylist, setCurrentPlaylist] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   
   // State for chat
   const [messages, setMessages] = useState([
@@ -79,6 +81,7 @@ function App() {
       }]);
       
       setRecommendations(data.recommendations);
+      setCurrentPlaylist(data.recommendations);
     } catch (error) {
       console.error('Error fetching recommendations:', error);
     }
@@ -125,6 +128,8 @@ function App() {
       // Update recommendations if any
       if (data.recommendations && data.recommendations.length > 0) {
         setRecommendations(data.recommendations);
+        setCurrentPlaylist(data.recommendations);
+        setCurrentIndex(0);
       }
     } catch (error) {
       console.error('Error sending message:', error);
@@ -142,6 +147,42 @@ function App() {
   
   // Handle recommendation selection
   const handleSelectRecommendation = (song) => {
+    const index = currentPlaylist.findIndex(s => s.id === song.id);
+    if (index !== -1) {
+      setCurrentIndex(index);
+    }
+    setCurrentSong({
+      title: song.title,
+      artist: song.artist,
+      album: song.album,
+      duration: song.duration,
+      currentTime: 0
+    });
+    setIsPlaying(true);
+  };
+  
+  // Handle previous song
+  const handlePreviousSong = () => {
+    if (currentPlaylist.length === 0) return;
+    const newIndex = (currentIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
+    setCurrentIndex(newIndex);
+    const song = currentPlaylist[newIndex];
+    setCurrentSong({
+      title: song.title,
+      artist: song.artist,
+      album: song.album,
+      duration: song.duration,
+      currentTime: 0
+    });
+    setIsPlaying(true);
+  };
+  
+  // Handle next song
+  const handleNextSong = () => {
+    if (currentPlaylist.length === 0) return;
+    const newIndex = (currentIndex + 1) % currentPlaylist.length;
+    setCurrentIndex(newIndex);
+    const song = currentPlaylist[newIndex];
     setCurrentSong({
       title: song.title,
       artist: song.artist,
@@ -181,7 +222,7 @@ function App() {
           </div>
           
           <div className="player-controls">
-            <button className="control-btn">
+            <button className="control-btn" onClick={handlePreviousSong}>
               <SkipBack size={24} />
             </button>
             <button 
@@ -190,7 +231,7 @@ function App() {
             >
               {isPlaying ? <Pause size={32} /> : <Play size={32} />}
             </button>
-            <button className="control-btn">
+            <button className="control-btn" onClick={handleNextSong}>
               <SkipForward size={24} />
             </button>
           </div>
