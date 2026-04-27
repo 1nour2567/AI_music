@@ -323,6 +323,100 @@ async def health_check():
     """Health check endpoint"""
     return {"status": "healthy"}
 
+
+# Song Management APIs
+@app.get("/api/songs")
+async def get_all_songs():
+    """Get all songs in the database"""
+    session = recommendation_engine.Session()
+    try:
+        from models.music import Song
+        songs = session.query(Song).all()
+        
+        return {
+            "songs": [
+                {
+                    "id": song.id,
+                    "title": song.title,
+                    "artist": song.artist,
+                    "album": song.album,
+                    "genre": song.genre,
+                    "release_year": song.release_year,
+                    "duration": song.duration
+                }
+                for song in songs
+            ],
+            "total": len(songs)
+        }
+    except Exception as e:
+        print(f"Error getting songs: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        session.close()
+
+
+@app.post("/api/songs")
+async def add_song(song_data: dict):
+    """Add a new song"""
+    session = recommendation_engine.Session()
+    try:
+        from models.music import Song
+        
+        # Check if song already exists
+        existing_song = session.query(Song).filter_by(id=song_data.get("id")).first()
+        if existing_song:
+            raise HTTPException(status_code=400, detail="Song already exists")
+        
+        song = Song(
+            id=song_data.get("id"),
+            title=song_data.get("title"),
+            artist=song_data.get("artist", []),
+            album=song_data.get("album", "Unknown Album"),
+            genre=song_data.get("genre", []),
+            release_year=song_data.get("release_year"),
+            duration=song_data.get("duration", 180),
+            features=song_data.get("features", {})
+        )
+        
+        session.add(song)
+        session.commit()
+        
+        return {"message": "Song added successfully", "song_id": song.id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        session.rollback()
+        print(f"Error adding song: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        session.close()
+
+
+@app.delete("/api/songs/{song_id}")
+async def delete_song(song_id: str):
+    """Delete a song"""
+    session = recommendation_engine.Session()
+    try:
+        from models.music import Song
+        
+        song = session.query(Song).filter_by(id=song_id).first()
+        if not song:
+            raise HTTPException(status_code=404, detail="Song not found")
+        
+        session.delete(song)
+        session.commit()
+        
+        return {"message": "Song deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        session.rollback()
+        print(f"Error deleting song: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        session.close()
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(

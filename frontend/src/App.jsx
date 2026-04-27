@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Send } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Send, Settings } from 'lucide-react';
+import SongManager from './SongManager';
 
 function App() {
   // State for player
@@ -26,6 +27,7 @@ function App() {
   const [inputMessage, setInputMessage] = useState('');
   const [recommendations, setRecommendations] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showManager, setShowManager] = useState(false);
   
   const messagesEndRef = useRef(null);
   
@@ -206,11 +208,27 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>Claudio</h1>
-        <p>智能音乐代理</p>
+        <div className="header-left">
+          <h1>Claudio</h1>
+          <p>智能音乐代理</p>
+        </div>
+        <button 
+          className="manager-btn"
+          onClick={() => setShowManager(!showManager)}
+          title="歌曲管理"
+        >
+          <Settings size={20} />
+        </button>
       </header>
       
       <main className="main-content">
+        {showManager ? (
+          <SongManager 
+            onClose={() => setShowManager(false)}
+            onRefresh={() => fetchRecommendations()}
+          />
+        ) : (
+          <>
         {/* Player Section */}
         <section className="player-section">
           <h2>音乐播放器</h2>
@@ -303,6 +321,8 @@ function App() {
             </div>
           )}
         </section>
+        </>
+      )}
       </main>
     </div>
   );

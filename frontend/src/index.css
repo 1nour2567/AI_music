@@ -250,3 +250,261 @@ body {
     padding: 20px;
   }
 }
+
+/* Header with management button */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  flex: 1;
+  text-align: center;
+}
+
+.manager-btn {
+  background: none;
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.manager-btn:hover {
+  background: #f0f0f0;
+}
+
+/* Song Manager Styles */
+.song-manager {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  width: 100%;
+}
+
+.manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.manager-header h2 {
+  font-size: 1.5rem;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.manager-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.add-btn, .close-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.3s;
+}
+
+.add-btn {
+  background: #1db954;
+  color: white;
+}
+
+.add-btn:hover {
+  background: #1ed760;
+}
+
+.close-btn {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.close-btn:hover {
+  background: #e0e0e0;
+}
+
+.add-song-form {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.add-song-form h3 {
+  margin-bottom: 20px;
+  color: #1a1a1a;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border 0.3s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #1db954;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.submit-btn {
+  padding: 12px 30px;
+  background: #1db954;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #1ed760;
+}
+
+.submit-btn:disabled {
+  background: #a0e0a0;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  padding: 12px 30px;
+  background: #f5f5f5;
+  color: #333;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s;
+}
+
+.cancel-btn:hover {
+  background: #e0e0e0;
+}
+
+.songs-list {
+  margin-top: 20px;
+}
+
+.songs-list h3 {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #1a1a1a;
+}
+
+.songs-list ul {
+  list-style: none;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.song-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s;
+}
+
+.song-item:hover {
+  background: #f9f9f9;
+}
+
+.song-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.song-info h4 {
+  font-size: 1rem;
+  color: #1a1a1a;
+  margin-bottom: 3px;
+}
+
+.song-info p {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.song-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.duration {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #ff4444;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn:hover {
+  background: #ffe0e0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+}
+
